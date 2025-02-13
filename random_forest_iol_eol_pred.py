@@ -10,18 +10,27 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Load data
-df_inline = pd.read_csv("inline_data_50lots.csv")
-df_eol = pd.read_csv("eol_data_50lots_final.csv")
+df_inline = pd.read_csv("inline_data_50lots_new.zip")
+df_eol = pd.read_csv("eol_data_50lots_new.zip")
 
 # Merge datasets
 data = pd.merge(df_inline, df_eol, on="Device_ID")
 
 # Data Cleaning: Impute missing values with median
-imputer = SimpleImputer(strategy='median')
-data.iloc[:, 1:] = imputer.fit_transform(data.iloc[:, 1:])
+#imputer = SimpleImputer(strategy='median')
+#data.iloc[:, 1:] = imputer.fit_transform(data.iloc[:, 1:])
+
+# Data Cleaning: Separate numeric and non-numeric columns
+numeric_cols = data.select_dtypes(include=["number"]).columns
+non_numeric_cols = data.select_dtypes(exclude=["number"]).columns
+
+# Impute missing values in numeric columns with median
+imputer = SimpleImputer(strategy="median")
+data[numeric_cols] = imputer.fit_transform(data[numeric_cols])
+
 
 # Feature Selection: Find most important features
-X = data.drop(columns=["Device_ID", "Result", "Fail_Bin"])
+X = data.drop(columns=["Wafer_ID","Device_ID","X_x","Y_x","X_y","Y_y","Result", "Fail_Bin"])
 y = data["Result"].map({"Pass": 0, "Fail": 1})
 feature_importances = mutual_info_classif(X, y, discrete_features=False)
 important_features = X.columns[np.argsort(feature_importances)[-10:]]
