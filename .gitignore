@@ -172,6 +172,5 @@ cython_debug/
 
 
 #Add .idea dir to gitignore
-.idea
-misc.xml
-.idea/misc.xml
+/.idea/
+/.idea/misc.xml
