@@ -59,6 +59,7 @@ joblib.dump(model_rf, "rf_model.pkl")
 # Function to predict new inline data
 def predict_eol(new_data_path, model_path="rf_model.pkl", features_path="important_features.pkl"):
     model = joblib.load(model_path)
+    #load the important features
     important_features = joblib.load(features_path)
     new_data = pd.read_csv(new_data_path)
     new_data = new_data[important_features]
