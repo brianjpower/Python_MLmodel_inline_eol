@@ -34,6 +34,7 @@ X = data.drop(columns=["Wafer_ID","Device_ID","X_x","Y_x","X_y","Y_y","Result", 
 y = data["Result"].map({"Pass": 0, "Fail": 1})
 feature_importances = mutual_info_classif(X, y, discrete_features=False)
 important_features = X.columns[np.argsort(feature_importances)[-10:]]
+joblib.dump(important_features, "important_features.pkl")
 
 # Filter dataset to include only important features
 X_filtered = X[important_features]
@@ -56,13 +57,13 @@ print(classification_report(y_test, y_pred))
 joblib.dump(model_rf, "rf_model.pkl")
 
 # Function to predict new inline data
-def predict_eol(new_data_path, model_path="rf_model.pkl"):
+def predict_eol(new_data_path, model_path="rf_model.pkl", features_path="important_features.pkl"):
     model = joblib.load(model_path)
+    important_features = joblib.load(features_path)
     new_data = pd.read_csv(new_data_path)
     new_data = new_data[important_features]
     new_data = imputer.transform(new_data)
-    predictions = model.predict(new_data)
-    return predictions
+    return model.predict(new_data)
 
 # Example usage
 # predictions = predict_eol("new_inline_data.csv")
